@@ -1,5 +1,10 @@
 const { google } = require('googleapis');
 const fetch = require('node-fetch');
+const axios = require('axios');
+const base64url = require('base64url');
+
+const fs = require('fs');
+const path = require('path');
 
 const express = require('express');
 
@@ -13,11 +18,17 @@ const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_U
 
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
+async function saveAttachment(filename, data) {
+  const buffer = base64url.toBuffer(data);
+  fs.writeFileSync(path.join(__dirname, filename), buffer);
+  console.log(`Attachment ${filename} saved.`);
+}
+
 app.get('/test', async (req, res, next) => {
   const { token: accessTokenGmail } = await oAuth2Client.getAccessToken();
 
   const getListMsgMail = await fetch(
-    `https://gmail.googleapis.com/gmail/v1/users/dangminhduca3@gmail.com/messages?q=from:VCBDigibank&maxResults=1`,
+    `https://gmail.googleapis.com/gmail/v1/users/dangminhduca3@gmail.com/messages?q=from:Duc Dang&maxResults=1`,
     {
       method: 'GET',
       headers: {
@@ -42,11 +53,26 @@ app.get('/test', async (req, res, next) => {
 
   const detailMsg = await getDetailMsg.json();
 
-  const base64Res = detailMsg.payload.body.data;
+  const attachmentId = detailMsg.payload.parts[1].body.attachmentId;
 
-  const bodyRes = Buffer.from(base64Res, 'base64').toString('utf-8');
+  console.log({ attachmentId });
 
-  return res.status(200).send({ bodyRes });
+  const getAttachmentFile = await fetch(
+    `https://www.googleapis.com/gmail/v1/users/me/messages/${msgId}/attachments/${attachmentId}
+  `,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessTokenGmail}`,
+      },
+    }
+  );
+
+  const attachmentFileJson = await getAttachmentFile.json();
+
+  await saveAttachment(detailMsg.payload.parts[1].filename, attachmentFileJson.data);
+
+  return res.status(200).send(detailMsg);
 });
 
 app.listen(3000, () => {
