@@ -1,0 +1,23 @@
+{
+  "5add9c3f-7820-406f-91a8-bc57cc4ba3e2": "Không download được ảnh",
+  "df7b06cd-357b-4bc4-922f-6b44d3544818": "Ảnh chụp bị tối",
+  "3ac14e35-6bc4-4712-8c3b-f399dd6f804e": "Trả ra error của engine",
+  "03ab0112-5122-402b-a804-d4d8078e19d9": "Ảnh chụp qua màn hình. Vui lòng chụp lại",
+  "defd7cb5-8201-4ef8-ada8-37ac5bcbb371": "Không thể nhận diện ô tô trong ảnh. Vui lòng chụp lại",
+  "f1997500-79d1-4b4b-abfb-c971d4ea65bb": "Không thể nhận diện ô tô trong ảnh. Vui lòng chụp lại",
+  "0d390361-91a6-46b6-a309-5fb410ab2e4f": "Ảnh chụp bị mờ. Vui lòng chụp lại",
+  "3abd6bf6-a2f0-4d29-893b-2f3a73dd48bc": "Ảnh chụp bị lóa",
+  "d1da473c-f5a2-4217-839f-37f74ad44827": "Ảnh không đúng góc chụp. Vui lòng chụp lại",
+  "0454714e-b3fd-4c2b-8618-752e39a2f36e": "Tài khoản của bạn đã bị vô hiệu hóa",
+  "3c5f3a82-30cd-49ca-87bc-6c68a968be66": "Đăng nhập không thành công. Tài khoản hoặc mật khẩu không đúng. Đăng nhập sai {{numLoginWrongAllow}} lần sẽ bị khóa tài khoản trong vòng {{numOfHoursAllowedRelogin}} giờ",
+  "845d7da7-5acb-414b-9b64-e874a397ab9e": "Tài khoản của bạn tạm thời bị khóa trong vòng {{numOfHoursAllowedRelogin}} giờ vì bạn đã đăng nhập sai {{numLoginWrongAllow}} lần.",
+  "8dd0d415-1109-4cb0-a085-e2fd88a18db9": "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại",
+  "ed43226e-101c-485d-b9a1-a6590f600179": "Token đã hết hạn",
+  "cac1dcaa-2733-4807-a633-cf8c07e86cda": "Ngày hết hạn phải sau ngày hiện tại",
+  "ef54d9b9-95fc-40ee-a673-da4779e9d0fa": "API token không tồn tại",
+  "73117847-5f20-4258-9f9b-4e63a7a28ae0": "Token không tồn tại",
+  "a6cc42eb-f582-4c84-a64b-57ad3769babf": "Không tìm thấy authToken, vui lòng kiểm tra requireAuthentication middleware",
+  "6ebbe085-9f03-4a1d-84a3-8f507679bff6": "Đăng xuất thành công",
+  "bcc1f88c-37e8-4bce-b879-fcd9b8a339fe": "{{score}}% không phải là ô tô",
+  "c3cdcd23-db13-4f10-9e96-305f731ac717": "{{score}}% ảnh chụp qua màn hình"
+}
