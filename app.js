@@ -101,8 +101,8 @@ app.post('/tracking', async (req, res, next) => {
   //   XLSX.writeFile(workbook, "test.xlsx", { compression: true });
   //   res.status(200).end();
 
-  const startTime = '2024-04-01';
-  const endTime = '2024-04-23';
+  const startTime = '2024-03-15';
+  const endTime = '2024-06-15';
 
   const getFolders =
     await pool.query(`SELECT ic.claim_id, ic.vehicle_license_plates, date(ic.created_date + interval '7 hours')
@@ -669,6 +669,108 @@ app.post('/import-vni-unmapping-data', async (req, res, next) => {
   `;
 
   await dbLocal.query(pgFormat(sql, dataInsertDb), []);
+
+  return res.status(200).send('ok');
+});
+
+app.post('/clone-label-source', async (req, res, next) => {
+  const getImageHasLabelPoint = await dbAidata.query(`
+      select distinct ls.source_id
+    from label_source ls
+    inner join label_point lp on ls.source_id = lp.source_id
+    where ls.dataset_id = 18931 limit 10;
+    `);
+  const imageIdsHasLabelPoint = getImageHasLabelPoint.rows.map((ilp) => ilp.source_id);
+
+  for (let i = 0; i < imageIdsHasLabelPoint.length; i++) {
+    const currentImageId = imageIdsHasLabelPoint[i];
+
+    const getCurrentLabelSourceInfo = await dbAidata.query(`
+        SELECT * FROM label_source WHERE source_id = ${currentImageId}
+      `);
+
+    const currentSouceInfo = getCurrentLabelSourceInfo.rows[0];
+    const currentSourceInfoColumn = Object.keys(currentSouceInfo).filter((cs) => {
+      return cs !== 'source_id';
+    });
+    const arrayKeySouce = Array.from(
+      { length: currentSourceInfoColumn.length },
+      (_, i) => `$${i + 1}`
+    );
+
+    const currentSourceInfoValue = currentSourceInfoColumn.map((cs) => {
+      if (cs === 'dataset_id') {
+        currentSouceInfo[cs] = 18949;
+      }
+
+      return currentSouceInfo[cs];
+    });
+
+    //clone source//
+    const insertNewLabelSource = await dbAidata.query(
+      `
+        INSERT INTO label_source (${currentSourceInfoColumn.join(', ')}) VALUES (${arrayKeySouce})
+        RETURNING source_id
+      
+      `,
+      [...currentSourceInfoValue]
+    );
+    //clone source//
+
+    const newSouceId = insertNewLabelSource.rows[0];
+
+    const getCurrentLabelPointWithSource = await dbAidata.query(`
+        SELECT * FROM label_point WHERE source_id = ${currentImageId}
+      `);
+
+    const currentLabelPointWithSouce = getCurrentLabelPointWithSource.rows;
+
+    for (let j = 0; j < currentLabelPointWithSouce.length; j++) {
+      const currentPoint = currentLabelPointWithSouce[j];
+
+      const currentLabelPointColumn = Object.keys(currentPoint).filter((ci) => {
+        return ci !== 'label_point_id';
+      });
+
+      const arrayKeyPoint = Array.from(
+        { length: currentLabelPointColumn.length },
+        (_, i) => `$${i + 1}`
+      );
+
+      const currentPointValue = currentLabelPointColumn.map((ci) => {
+        if (ci === 'dataset_id') {
+          currentPoint[ci] = 18949;
+        }
+
+        if (ci === 'source_id') {
+          currentPoint[ci] = newSouceId.source_id;
+        }
+
+        if (ci === 'data_point') {
+          currentPoint[ci] = JSON.stringify(currentPoint[ci]);
+        }
+
+        return currentPoint[ci];
+      });
+
+      //clone point//
+
+      // console.log(currentLabelPointColumn, currentPointValue);
+
+      const insertNewLabelPoint = await dbAidata.query(
+        `
+        INSERT INTO label_point (${currentLabelPointColumn.join(', ')}) VALUES (${arrayKeyPoint})
+        RETURNING label_point_id
+
+      `,
+        [...currentPointValue]
+      );
+
+      // console.log(insertNewLabelPoint.rows);
+
+      //clone point//
+    }
+  }
 
   return res.status(200).send('ok');
 });
